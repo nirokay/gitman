@@ -33,13 +33,25 @@ proc pullCommand*(dirs: seq[string]) =
 
     for dir in dirs:
         setCurrentDir(dir)
-        echo "\nPulling git repo at: " & dir
+        styledEcho fgYellow, "\n🠗 Pulling git directory at '", dir, "'!", fgDefault
 
         # Exit Code stuff:
-        var exitCode: int = execCmd("git pull")
+        var
+            code: int = execCmd("git pull")
+            col: ForegroundColor
+            status: string
+        
+        if code == 0:
+            col = fgGreen
+            status = "✓"
+        else:
+            col = fgRed
+            status = "×"
+
+        styledEcho col, status, " Finished pulling '", dir, "' with exit code ", $code, "!\n", fgDefault
         exitCodes.add(ExitCode(
             origin: dir,
-            code: exitCode
+            code: code
         ))
 
     setCurrentDir(pwd)

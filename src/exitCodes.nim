@@ -21,5 +21,5 @@ proc filterOnly*(exitCodes: seq[ExitCode], code: int): seq[ExitCode] =
     return result
 
 proc concat*(exitCodes: seq[ExitCode]) =
-    for exitCode in exitCodes:
-        styledEcho fgYellow, "Exit code ", $exitCode.code, fgDefault, " on '", fgYellow, exitCode.origin, fgDefault, "'!"
+    for id, exitCode in exitCodes:
+        styledEcho fgDefault, "\t", $(id+1), ". ", fgYellow, "exit code ", $exitCode.code, " on '", exitCode.origin, fgDefault, "'!"

@@ -95,7 +95,7 @@ proc findOperationByString(str: string): Operation =
     # Return empty/generic operation:
     return Operation(
         name: "Unknown operation",
-        description: "This operation is called when none has been found.",
+        description: "This operation is called when none has been found. See help for further information!",
         procedure: proc() =
             echo "No such valid operation found. ('" & str & ")"
             quit(1)
