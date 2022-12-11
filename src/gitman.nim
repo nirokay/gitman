@@ -35,7 +35,8 @@ for id, file in ConfigFiles:
 
 # Read Config Files:
 let gitDir: string = ConfigFiles[0].readData().strip()
-
+if not gitDir.dirExists():
+    gitDir.createDir()
 
 # Read Git Directory:
 proc getDirectoryDirectories(dir: string): seq[string] = 
