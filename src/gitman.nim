@@ -11,10 +11,15 @@ for i in 0..paramCount():
 
 # Path to config directory:
 var configDirectory*: string
-if defined(linux) or defined(macosx) or defined(posix):
+if defined macosx:
+    configDirectory = getConfigDir() & "Library/Preferences/" & applicationIdentity & "/"
+
+elif defined(linux) or defined(posix):
     configDirectory = getConfigDir() & applicationIdentity & "/"
+
 elif defined windows:
     configDirectory = getHomeDir() & "AppData/Local/" & applicationIdentity & "/"
+
 else:
     configDirectory = getHomeDir() & applicationIdentity & "-config/"
 
