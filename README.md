@@ -14,7 +14,15 @@ There are several commands currently supported.
 
 * `help`: Displays a help message.
 
+* `remove [dir: string]`: Removes the specified directory inside the git-repo directory.
+
+* `list`: Lists all git repositories.
+
 Some commands may also have aliases, see `help` for more information.
+
+## Changes
+
+See [Changes](CHANGES.md) document.
 
 ## Supported Operating Systems
 
@@ -24,7 +32,9 @@ This program was tested on GNU/Linux (Manjaro) and Windows 10 (64 bit).
 
 ## Compiling from source
 
-You will need to have [nim](https://nim-lang.org) installed, as well as its package-manager nimble. You can easily build this program by executing `nim build`.
+You will need to have [nim](https://nim-lang.org) installed, as well as its package-manager nimble. You can easily build this program by executing `nimble build` or use the Makefile `make build`.
+
+If you are running a Linux system, you can install the program with `sudo make install` to `/usr/local/bin/`.
 
 ## Dependancies
 
