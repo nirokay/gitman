@@ -12,7 +12,7 @@ for i in 0..paramCount():
 # Path to config directory:
 var configDirectory*: string
 if defined macosx:
-    configDirectory = getConfigDir() & "Library/Preferences/" & applicationIdentity & "/"
+    configDirectory = getHomeDir() & "Library/Preferences/" & applicationIdentity & "/"
 
 elif defined(linux) or defined(posix):
     configDirectory = getConfigDir() & applicationIdentity & "/"
