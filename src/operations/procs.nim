@@ -1,18 +1,21 @@
 import strutils, strformat, options
 import ../globals, types
 
+using
+    op_args: seq[string]
+    _: seq[string]
 
-proc helpCommand*() =
-    var text: seq[seq[string]]
+proc helpCommand*(_) =
+    var text: seq[string]
     for op in operations:
         var temp: seq[string] = @[
             &"{op.name}:",
             repeat('-', op.name.len() + 1),
-            &"\t{op.desc}"
+            &"   {op.desc}"
         ]
         if op.alias.isSome():
-            temp.add("""\tAlso:\n\t {op.alias.get().join("\t")}""")
-        text.add(temp)
+            temp.add(&"   Also:\n     {op.alias.get().join(\"   \")}")
+        text.add(temp.join("\n"))
 
     echo @[
         &"{PROJECT_NAME} v{PROJECT_VERSION}",
