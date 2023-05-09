@@ -1,4 +1,4 @@
-import strutils, strformat, options
+import strutils, options
 import globals, operations_import, error
 
 when isMainModule:
@@ -13,4 +13,6 @@ when isMainModule:
         operation_args: seq[string] = args[1..^1]
     
     operation.check_valid_range(operation_args)
+    operation.call(operation_args)
+
 

@@ -5,7 +5,7 @@ type Operation* = object
     name*, desc*: string
     alias*: Option[seq[string]]
     args_range*: Option[array[2, Natural]]
-    call*: proc()
+    call*: proc(op_args: seq[string])
 
 var operations*: seq[Operation]
 
