@@ -25,7 +25,7 @@ add Operation(
     desc: "Clones new git repository to repo directory.",
     alias: some @["add", "download", "get"],
     args_range: some [1.Natural, 9999.Natural],
-    call: todo
+    call: cloneCommand
 )
 
 add Operation(
