@@ -47,7 +47,7 @@ add Operation(
     name: "list",
     desc: "Displays names of all clones git repositories.",
     alias: none seq[string],
-    call: todo
+    call: listCommand
 )
 
 

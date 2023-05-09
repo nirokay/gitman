@@ -1,9 +1,10 @@
 import strutils, strformat, options
-import ../globals, types
+import ../globals, ../fileio, types
 
 using
     op_args: seq[string]
     _: seq[string]
+
 
 proc helpCommand*(_) =
     var text: seq[string]
@@ -27,6 +28,8 @@ proc helpCommand*(_) =
     echo text.join("\n\n")
 
 
+proc listCommand*(_) =
+    echo get_valid_git_dirs_names().join("   ")
 
 
 

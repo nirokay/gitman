@@ -1,4 +1,4 @@
-import os, strutils, strformat
+import os, strformat
 import error
 
 # -----------------------------------------------------------------------------
@@ -31,7 +31,7 @@ proc confirm_repo_dir() =
 proc get_valid_git_dirs_paths*(): seq[string] =
     confirm_repo_dir()
     for dir in git_repo_path.walkDir(false):
-        if dir.kind != pcDir or dir.kind != pcLinkToDir: continue
+        if dir.kind != pcDir and dir.kind != pcLinkToDir: continue
         if dirExists(&"{$dir.path}/.git/"): result.add(dir.path)
     return result
 
