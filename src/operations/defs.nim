@@ -24,6 +24,7 @@ add Operation(
     name: "clone",
     desc: "Clones new git repository to repo directory.",
     alias: some @["add", "download", "get"],
+    args_range: some [1.Natural, 9999.Natural],
     call: todo
 )
 
@@ -38,6 +39,7 @@ add Operation(
     name: "remove",
     desc: "Removes git repository from repo directory.",
     alias: some @["delete", "rm", "del"],
+    args_range: some [1.Natural, 9999.Natural],
     call: todo
 )
 
