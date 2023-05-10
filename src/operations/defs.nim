@@ -33,7 +33,7 @@ add Operation(
     desc: "Pulls changes for every git repo.",
     alias: some @["update"],
     args_range: some [0.Natural, 9999.Natural],
-    call: todo
+    call: pullCommand
 )
 
 add Operation(

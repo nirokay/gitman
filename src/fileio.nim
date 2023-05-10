@@ -12,7 +12,7 @@ let git_repo_path*: string =
     if existsEnv(environment_variable): getEnv(environment_variable)
     else:
         putEnv(environment_variable, default_git_repo_path)
-        default_git_repo_path
+        default_git_repo_path & "/"
 
 
 

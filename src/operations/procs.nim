@@ -80,4 +80,39 @@ proc removeCommand*(op_args) =
         echo "\t" & status.failures.join("\n\t")
 
 
+proc pullCommand*(op_args) =
+    let valid_dirs: seq[string] = get_valid_git_dirs_names()
+    let dirs: seq[string] =
+        if op_args.len() == 0:
+            # Pull from all:
+            valid_dirs
+        else:
+            # Pull only specified:
+            var additions: seq[string]
+            for dir in op_args:
+                if dir in valid_dirs: additions.add(dir)
+            additions
+
+    # Quit if no valid dirs:
+    if dirs.len() == 0:
+        echo "No valid repository directories found."
+        quit(1)
+    
+    # cd into directories and pull changes:
+    var status: tuple[successes: int, failures: seq[string]]
+    for dir in dirs:
+        try:
+            styledEcho fgYellow, &"Pulling {dir}...", fgDefault
+            setCurrentDir(git_repo_path & dir)
+            if GIT_PULL.execute() == 0: status.successes += 1
+            else: status.failures.add(dir)
+        except OSError:
+            status.failures.add(dir)
+
+    # Echo result:
+    styledEcho fgGreen, &"\nSuccessful pulls: {status.successes}", fgDefault
+    if status.failures.len() > 0:
+        styledEcho fgRed, &"Failed to pull changes from following {status.failures.len()} repositories:\n" , fgDefault,
+            "\t" & status.failures.join("\n\t")
+
 
