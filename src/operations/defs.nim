@@ -32,6 +32,7 @@ add Operation(
     name: "pull",
     desc: "Pulls changes for every git repo.",
     alias: some @["update"],
+    args_range: some [0.Natural, 9999.Natural],
     call: todo
 )
 
@@ -40,7 +41,7 @@ add Operation(
     desc: "Removes git repository from repo directory.",
     alias: some @["delete", "rm", "del"],
     args_range: some [1.Natural, 9999.Natural],
-    call: todo
+    call: removeCommand
 )
 
 add Operation(

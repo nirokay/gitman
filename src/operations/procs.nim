@@ -1,4 +1,4 @@
-import os, strutils, strformat, options
+import std/[os, strutils, strformat, options, terminal]
 import ../globals, ../fileio, types, gitcommands
 
 using
@@ -43,11 +43,41 @@ proc cloneCommand*(op_args) =
         if succ == 0: successes.add(repo)
         else: failures.add(repo)
 
-    echo ""
+    stdout.write "\n"
     if successes.len() != 0:
         echo &"Successful clones: {successes.len()}"
     if failures.len() != 0:
         echo &"Failed clones: {failures.len()}"
         echo "\t" & failures.join("\n\t")
+
+
+proc removeCommand*(op_args) =
+    let valid_dirs: seq[string] = get_valid_git_dirs_names()
+    var dirs_to_delete: seq[string]
+    for dir in op_args:
+        if dir in valid_dirs: dirs_to_delete.add(dir)
+
+    if dirs_to_delete.len() == 0:
+        echo "No directories found with matching names."
+        quit(1)
+
+    # Ask for confirmation:
+    styledEcho fgRed, &"You are about to remove these {dirs_to_delete.len()} repositories:", fgDefault
+    echo dirs_to_delete.join(", ")
+    stdout.styledWrite fgRed, &"This cannot be undone. Are you sure you want to proceed?", fgDefault, " [y/N] "
+    let confirm: char = getch()
+    stdout.write("\n")
+    if confirm.toLowerAscii() != 'y':
+        echo "Aborting."
+        quit(1)
+
+    # Remove dirs:
+    let status: tuple[successes: int, failures: seq[string]] = remove_git_dirs(dirs_to_delete)
+
+    echo &"Successfully removed {status.successes} repositories!"
+    if status.failures.len() > 0:
+        echo &"Failed on {status.failures.len()} repositories:"
+        echo "\t" & status.failures.join("\n\t")
+
 
 

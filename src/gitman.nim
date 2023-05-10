@@ -1,5 +1,7 @@
-import strutils, options
+import std/[strutils, options]
 import globals, operations_import, error
+
+from fileio import confirm_repo_dir
 
 when isMainModule:
     # Argument parsing:
@@ -11,8 +13,9 @@ when isMainModule:
     let
         operation: Operation = request.get()
         operation_args: seq[string] = args[1..^1]
-    
+
     operation.check_valid_range(operation_args)
+    confirm_repo_dir()
     operation.call(operation_args)
 
 

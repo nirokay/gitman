@@ -20,7 +20,7 @@ let git_repo_path*: string =
 # Dir procs:
 # -----------------------------------------------------------------------------
 
-proc confirm_repo_dir() =
+proc confirm_repo_dir*() =
     try:
         if not git_repo_path.dirExists():
             git_repo_path.createDir()
@@ -40,5 +40,11 @@ proc get_valid_git_dirs_names*(): seq[string] =
         result.add(dir.splitPath().tail)
     return result
 
-
-
+proc remove_git_dirs*(dirs: seq[string]): tuple[successes: int, failures: seq[string]] =
+    ## Removes all directories and returns amount of successes and a sequence of failed directories
+    for dir in dirs:
+        try:
+            removeDir(git_repo_path & dir)
+            result.successes += 1
+        except OSError:
+            result.failures.add(dir)
