@@ -1,4 +1,12 @@
-# Chnages
+# Changes
+
+## 2.0.0
+
+Entire codebase rewritten to be more managable and cleaner.
+
+Behaviour:
+
+* commands like `pull`, `clone` and `remove` can now accept multiple arguments (invalid args will be filtered in certain scenarios)
 
 ## 1.0.1
 
