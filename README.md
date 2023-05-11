@@ -23,6 +23,22 @@ Arguments:
 
 Some commands may also have aliases, see `help` for more information.
 
+## Installation
+
+You will need to have [Nim](https://nim-lang.org) installed, as well as its package-manager nimble.
+
+**Note:**
+
+If you are using `nimble install`, make sure the nimble/bin directory is in your path (default: `~/.nimble/bin/`)!
+
+### nimble
+
+`nimble install gitman`
+
+### Compiling manually from source
+
+Clone the repository and run `nimble build -d:release` to compile or `nimble install` to install it to the nimble/bin directory.
+
 ## Configuration
 
 There are no configuration files for this program (anymore). You can set a custom git directory by changing the `GITMAN_REPOS_LOCATION` environment variable.
@@ -40,18 +56,6 @@ This will only be available for the current session. Consider putting the string
 ## Changes
 
 See [Changes](CHANGES.md) document.
-
-## Installation
-
-You will need to have [Nim](https://nim-lang.org) installed, as well as its package-manager nimble.
-
-### nimble installation
-
-You can run `nimble install gitman` to automatically install this program. (SOON!)
-
-### Compiling from source
-
-You can build this program with `nimble build` and move the executable in your path. The latter will be done automatically, if you execute `nimble install` (Verify that the nimble binary directory is in your path!).
 
 ## Supported Operating Systems
 
