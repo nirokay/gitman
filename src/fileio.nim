@@ -1,4 +1,4 @@
-import os, strformat
+import std/[os, strformat]
 import error
 
 # -----------------------------------------------------------------------------
@@ -40,7 +40,7 @@ proc get_valid_git_dirs_names*(): seq[string] =
         result.add(dir.splitPath().tail)
     return result
 
-proc remove_git_dirs*(dirs: seq[string]): tuple[successes: int, failures: seq[string]] =
+proc remove_git_dirs*(dirs: seq[string]): ErrorStatus =
     ## Removes all directories and returns amount of successes and a sequence of failed directories
     for dir in dirs:
         try:

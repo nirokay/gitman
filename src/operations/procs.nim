@@ -1,5 +1,5 @@
 import std/[os, strutils, strformat, options, terminal]
-import ../globals, ../fileio, types, gitcommands
+import ../globals, ../fileio, ../error, types, gitcommands
 
 using
     op_args: seq[string]
@@ -32,23 +32,17 @@ proc listCommand*(_) =
 
 
 proc cloneCommand*(op_args) =
-    var
-        successes: seq[string]
-        failures: seq[string]
+    var status: ErrorStatus
 
     git_repo_path.setCurrentDir()
     for repo in op_args:
         let succ: int = GIT_CLONE.execute(repo)
         # Save successes and failures:
-        if succ == 0: successes.add(repo)
-        else: failures.add(repo)
+        if succ == 0: status.successes += 1
+        else: status.failures.add(repo)
 
     stdout.write "\n"
-    if successes.len() != 0:
-        echo &"Successful clones: {successes.len()}"
-    if failures.len() != 0:
-        echo &"Failed clones: {failures.len()}"
-        echo "\t" & failures.join("\n\t")
+    status.print_after_clone()
 
 
 proc removeCommand*(op_args) =
@@ -72,12 +66,9 @@ proc removeCommand*(op_args) =
         quit(1)
 
     # Remove dirs:
-    let status: tuple[successes: int, failures: seq[string]] = remove_git_dirs(dirs_to_delete)
-
-    echo &"Successfully removed {status.successes} repositories!"
-    if status.failures.len() > 0:
-        echo &"Failed on {status.failures.len()} repositories:"
-        echo "\t" & status.failures.join("\n\t")
+    let status: ErrorStatus = remove_git_dirs(dirs_to_delete)
+    stdout.write("\n")
+    status.print_after_remove()
 
 
 proc pullCommand*(op_args) =
@@ -99,7 +90,7 @@ proc pullCommand*(op_args) =
         quit(1)
     
     # cd into directories and pull changes:
-    var status: tuple[successes: int, failures: seq[string]]
+    var status: ErrorStatus
     for dir in dirs:
         try:
             styledEcho fgYellow, &"Pulling {dir}...", fgDefault
@@ -109,10 +100,7 @@ proc pullCommand*(op_args) =
         except OSError:
             status.failures.add(dir)
 
-    # Echo result:
-    styledEcho fgGreen, &"\nSuccessful pulls: {status.successes}", fgDefault
-    if status.failures.len() > 0:
-        styledEcho fgRed, &"Failed to pull changes from following {status.failures.len()} repositories:\n" , fgDefault,
-            "\t" & status.failures.join("\n\t")
+    stdout.write("\n")
+    status.print_after_pull()
 
 

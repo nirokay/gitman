@@ -1,11 +1,8 @@
-import options
+import std/options
 import types, procs
 
 proc add(op: Operation) =
     operations.add(op)
-
-proc todo(_: seq[string]) =
-    echo "Function not yet implemented..."
 
 
 

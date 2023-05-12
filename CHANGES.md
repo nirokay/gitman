@@ -1,5 +1,9 @@
 # Changes
 
+## 2.0.1
+
+Streamlined feedback after clones, pulls and removed.
+
 ## 2.0.0
 
 Entire codebase rewritten to be more managable and cleaner.

@@ -1,4 +1,4 @@
-import os, strutils, strformat
+import std/[os, strutils, strformat]
 
 const git_executable: string =
     when defined(windows): "git.exe"
