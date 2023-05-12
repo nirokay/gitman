@@ -9,14 +9,17 @@ gitman is a cross-platform manager for git repositories, that are located inside
 Arguments:
 
 * `clone [url: string]`: Clones one or more git repositories to the git repository directory. (urls seperated by spaces)
+  
   **Example:** `gitman clone https://github.com/nirokay/gitman https://github.com/nirokay/nirokay`
 
 * `pull`: Pulls every repository's changes, or only the ones which names are provided.
+  
   **Examples:** `gitman pull` (pulls all repos), `gitman pull gitman nirokay` (only pulls gitman and nirokay repo)
 
 * `help`: Displays a help message.
 
 * `remove [dir: string]`: Removes the specified directory inside the git-repo directory. Can accept mutliple directories to remove.
+  
   **Example:** `gitman remove nirokay gitman`
 
 * `list`: Lists all git repositories.
