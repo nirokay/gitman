@@ -6,7 +6,8 @@ const git_executable: string =
 
 type GitCommand* = enum
     GIT_CLONE = "clone",
-    GIT_PULL = "pull"
+    GIT_PULL = "pull",
+    GIT_CHECK_UPDATES = "fetch --dry-run"
 
 proc execute*(command: GitCommand, args: string = ""): int =
     ## Runs `git [command] ?[args]` in shell.

@@ -19,7 +19,7 @@ proc operation_from_string*(str: string): Option[Operation] =
         for alias in op.alias.get():
             if alias != str: continue
             return some op
-    
+
     return none Operation
 
 proc check_valid_range*(op: Operation, operation_args: seq[string]) =

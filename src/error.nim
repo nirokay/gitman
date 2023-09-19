@@ -9,6 +9,10 @@ type
         IO_FAILURE = "Failed to read/write from/to disk." & help_io_text,
         READ_ERROR = "Failed to read from disk." & help_io_text,
         WRITE_ERROR = "Failed to write to disk." & help_io_text,
+        UNAVAILABLE_TEMP_FILENAMES = "Too many temporary files exist. Please consider removing some.",
+        TEMP_DIR_UNAVAILABLE = "Failed to get temporary directory.",
+
+        EDITOR_NOT_EXISTS = "The provided editor does not exist or is not in path.",
 
         OPERATION_NONE = "No arguments provided." & see_help_text,
         OPERATION_UNKNOWN = "Invalid argument." & see_help_text,
@@ -17,6 +21,11 @@ type
     ErrorStatus* = object
         successes*: int
         failures*: seq[string]
+
+
+proc add*(status: var ErrorStatus, dir: string, exit_code: int) =
+    if exit_code == 0: status.successes += 1
+    else: status.failures.add(dir)
 
 
 proc handle*(error: ErrorType, msg: string = "(none provided)") =
@@ -42,4 +51,5 @@ proc print_after_pull*(error: ErrorStatus) =
 proc print_after_remove*(error: ErrorStatus) =
     error.print("removes", &"to remove following {error.failures.len()} repositories")
 
-
+proc print_after_install*(error: ErrorStatus) =
+    error.print("installs", &"to install following {error.failures.len()} repositories")

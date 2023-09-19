@@ -1,5 +1,9 @@
 # Changes
 
+## 2.1.0
+
+Added support for installation scripts on a repo-to-repo basis.
+
 ## 2.0.1
 
 Streamlined feedback after clones, pulls and removed.

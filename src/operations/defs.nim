@@ -48,4 +48,16 @@ add Operation(
     call: listCommand
 )
 
+add Operation(
+    name: "install",
+    desc: "Executes a specified install script for the repository.",
+    alias: none seq[string],
+    call: installCommand
+)
 
+add Operation(
+    name: "edit-install",
+    desc: "Lets you quickly edit the install json file.",
+    alias: some @["edit"],
+    call: editInstallCommand
+)

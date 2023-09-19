@@ -9,20 +9,24 @@ gitman is a cross-platform manager for git repositories, that are located inside
 Arguments:
 
 * `clone [url: string]`: Clones one or more git repositories to the git repository directory. (urls seperated by spaces)
-  
+
   **Example:** `gitman clone https://github.com/nirokay/gitman https://github.com/nirokay/nirokay`
 
 * `pull`: Pulls every repository's changes, or only the ones which names are provided.
-  
+
   **Examples:** `gitman pull` (pulls all repos), `gitman pull gitman nirokay` (only pulls gitman and nirokay repo)
 
 * `help`: Displays a help message.
 
 * `remove [dir: string]`: Removes the specified directory inside the git-repo directory. Can accept mutliple directories to remove.
-  
+
   **Example:** `gitman remove nirokay gitman`
 
 * `list`: Lists all git repositories.
+
+* `install`: Executes installation commands specified in the installation json file (defualt: `$GITMAN_REPOS_LOCATION/.gitman-install.json`).
+
+  **Example:** `gitman install` (executes install instructions on every repository)
 
 Some commands may also have aliases, see `help` for more information.
 
@@ -40,7 +44,27 @@ If you are using `nimble install`, make sure the nimble/bin directory is in your
 
 ### Compiling manually from source
 
-Clone the repository and run `nimble build -d:release` to compile or `nimble install` to install it to the nimble/bin directory.
+Clone the repository and run `nimble build -d:release` to compile or `nimble install` to compile and install it to the nimble/bin directory.
+
+You can also set some compile-time flags to customise your the program to your liking.
+
+**List of compile-time flags:**
+
+* `environment_variable` (default: `GITMAN_REPOS_LOCATION`)
+
+  This sets the environment variable the program uses.
+
+* `gitman_install_file` (default: `.gitman-install.json`)
+
+  Changes the installation json-file name.
+
+**Usage:**
+
+When compiling add the `-d:` flag. For example:
+
+* `nimble build -d:environment_variable:NEW_ENV_VARIABLE`
+* `nimble build -d:gitman_install_file:new_file_name.json`
+* `nimble build -d:environment_variable:NEW_ENV_VARIABLE -d:gitman_install_file:new_file_name.json`
 
 ## Configuration
 

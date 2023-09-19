@@ -1,4 +1,4 @@
-import std/[os, strutils, strformat, options, terminal]
+import std/[os, strutils, strformat, options, terminal, tables]
 import ../globals, ../fileio, ../error, types, gitcommands
 
 using
@@ -71,9 +71,10 @@ proc removeCommand*(op_args) =
     status.print_after_remove()
 
 
-proc pullCommand*(op_args) =
+proc pick_valid_dirs_or_all(op_args): seq[string] =
+    ## Picks valid dirs from arguments or returns all valid git dirs if none given.
     let valid_dirs: seq[string] = get_valid_git_dirs_names()
-    let dirs: seq[string] =
+    result =
         if op_args.len() == 0:
             # Pull from all:
             valid_dirs
@@ -81,14 +82,57 @@ proc pullCommand*(op_args) =
             # Pull only specified:
             var additions: seq[string]
             for dir in op_args:
-                if dir in valid_dirs: additions.add(dir)
+                if dir in valid_dirs: result.add(dir)
             additions
+
+    return result
+
+proc checkUpdate(repo, tempDir: string): bool =
+    var tempFile: string = tempDir & "gitmanupdatecheck.temp"
+    let status: int = GIT_CHECK_UPDATES.execute(&"&> {tempFile}")
+
+    # stderr.writeLine "\nFile: " & readFile(tempFile) & "\n"
+    # stderr.flushFile()
+
+    if status != 0:
+        stderr.writeLine(&"Errors with dryrun (exit code {status}):\n{tempFile.readFile()}")
+    else:
+        # Check length of git output (shitty implementation but it works i guess):
+        if tempFile.readFile().len() > 2: result = true
+
+    try:
+        tempFile.removeFile()
+    except OSError:
+        stderr.writeLine(&"Failed to remove file '{tempFile}'! Continuing anyways.")
+
+
+proc getUpdateableRepos(op_args): seq[string] =
+    let
+        dirs: seq[string] = op_args
+        tempDir: string = getTempDir()
+    if not tempDir.dirExists():
+        TEMP_DIR_UNAVAILABLE.handle(&"Could not get '{tempDir}'...")
+
+    var currentDir: int
+    for repo in dirs:
+        if repo.checkUpdate(tempDir): result.add(repo)
+
+        # Little progress meter:
+        currentDir.inc()
+        stdout.write("\rChecking for updates... " & $(currentDir / dirs.len() * 100).formatFloat(precision = 4) & "%")
+        stdout.flushFile()
+    stdout.write "\n"
+    stdout.flushFile()
+
+
+proc pullCommand*(op_args) =
+    let dirs: seq[string] = op_args.pick_valid_dirs_or_all().getUpdateableRepos()
 
     # Quit if no valid dirs:
     if dirs.len() == 0:
-        echo "No valid repository directories found."
-        quit(1)
-    
+        echo "Nothing to do."
+        quit(0)
+
     # cd into directories and pull changes:
     var status: ErrorStatus
     for dir in dirs:
@@ -103,4 +147,50 @@ proc pullCommand*(op_args) =
     stdout.write("\n")
     status.print_after_pull()
 
+
+#proc installCommand*(op_args) = echo "ToDo!"
+
+proc installCommand*(op_args) =
+    let
+        install_instructions: Table[string, string] = read_install_config_file()
+        dirs: seq[string] = op_args.pick_valid_dirs_or_all()
+
+    if dirs.len() == 0:
+        echo &"Nothing to do. No valid install commands found in '{install_json_file}'..."
+        quit(1)
+
+    var status: ErrorStatus
+    for dir, command in install_instructions:
+        let full_dir: string = "$1/$2" % [git_repo_path, dir]
+        try:
+            full_dir.setCurrentDir()
+        except OSError as e:
+            echo "Could not set current directory to '$1'. Reason: ($2)" % [full_dir, e.msg]
+            continue
+
+        let exit_code: int = command.execShellCmd()
+        status.add(dir, exit_code)
+    status.print_after_install()
+
+proc editInstallCommand*(_) =
+    var editor: string
+    if existsEnv("EDITOR"): editor =
+        getEnv("EDITOR")
+    else:
+        stderr.write("No 'EDITOR' environment variable found.\nWith what editor do you want to open the config file? ")
+        editor = stdin.readLine()
+
+    if editor == "":
+        EDITOR_NOT_EXISTS.handle("Please type a correct executable name or set your 'EDITOR' environment variable!" &
+            (when not defined(windows):
+                "\nYou can do this by adding 'export EDITOR=editor_name' in your profile file (default: ~/.profile)!\n" &
+                "For example: 'export EDITOR=vim', 'export EDITOR=nano'"
+            )
+        )
+
+    let exitCode: int = execShellCmd("$1 $2" % [editor, install_json_file])
+    echo (
+        if exitCode == 0: "Successfully applied changes."
+        else: "Errors encountered. Please double-check if changes were written to disk!"
+    )
 

@@ -1,11 +1,14 @@
-import std/[os, strformat]
+import std/[os, strformat, json, tables, terminal]
 import error
 
 # -----------------------------------------------------------------------------
 # Git repo location:
 # -----------------------------------------------------------------------------
 
-const environment_variable: string = "GITMAN_REPOS_LOCATION"
+const
+    environment_variable {.strdefine.}: string = "GITMAN_REPOS_LOCATION"
+    gitman_install_file {.strdefine.}: string = ".gitman-install.json"
+
 let default_git_repo_path: string = getHomeDir() & "Git/"
 
 let git_repo_path*: string =
@@ -13,6 +16,8 @@ let git_repo_path*: string =
     else:
         putEnv(environment_variable, default_git_repo_path)
         default_git_repo_path & "/"
+
+let install_json_file*: string = git_repo_path & gitman_install_file
 
 
 
@@ -48,3 +53,25 @@ proc remove_git_dirs*(dirs: seq[string]): ErrorStatus =
             result.successes += 1
         except OSError:
             result.failures.add(dir)
+
+proc init_install_json() =
+    ## Makes sure the file for gitman installations is present.
+    if install_json_file.fileExists(): return
+    install_json_file.writeFile("{}")
+
+proc read_install_config_file*(): Table[string, string] =
+    init_install_json()
+    var json_install: JsonNode
+    try:
+        let raw_json: string = install_json_file.readFile()
+        json_install = raw_json.parseJson()
+    except JsonParsingError:
+        styledEcho fgRed, &"Failed to parse '{install_json_file}' json file. Is it valid json?", fgDefault
+        quit(1)
+
+    # Add only strings to JsonNode:
+    for repo, command in json_install:
+        if command.kind != JString: continue
+        result[$repo] = command.str
+
+
