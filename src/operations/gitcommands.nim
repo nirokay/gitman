@@ -1,3 +1,9 @@
+## Git commands module
+## ===================
+##
+## This module contains external git commands, that are passed to git through
+## the shell.
+
 import std/[os, strutils, strformat]
 
 const git_executable: string =

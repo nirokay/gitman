@@ -1,3 +1,8 @@
+## Operation procs module
+## ======================
+##
+## This module contains the logic of the operations commands.
+
 import std/[os, strutils, strformat, options, terminal, tables]
 import ../globals, ../fileio, ../error, types, gitcommands
 
@@ -7,6 +12,7 @@ using
 
 
 proc helpCommand*(_) =
+    ## Help command - prints basic program information and all commands.
     var text: seq[string]
     for op in operations:
         var temp: seq[string] = @[
@@ -28,10 +34,12 @@ proc helpCommand*(_) =
 
 
 proc listCommand*(_) =
+    ## List command - lists all git repositories in the repo-directory.
     echo get_valid_git_dirs_names().join("   ")
 
 
 proc cloneCommand*(op_args) =
+    ## Clone command - clones a repository into the repo-directory.
     var status: ErrorStatus
 
     git_repo_path.setCurrentDir()
@@ -46,6 +54,7 @@ proc cloneCommand*(op_args) =
 
 
 proc removeCommand*(op_args) =
+    ## Remove command - removes a repository from the repo-directory.
     let valid_dirs: seq[string] = get_valid_git_dirs_names()
     var dirs_to_delete: seq[string]
     for dir in op_args:
@@ -88,6 +97,8 @@ proc pick_valid_dirs_or_all(op_args): seq[string] =
     return result
 
 proc checkUpdate(repo, tempDir: string): bool =
+    ## Checks if a repository is updatable with git dry run.
+    # TODO: Implement and make it actually work...
     var tempFile: string = tempDir & "gitmanupdatecheck.temp"
     let status: int = GIT_CHECK_UPDATES.execute(&"&> {tempFile}")
 
@@ -107,6 +118,7 @@ proc checkUpdate(repo, tempDir: string): bool =
 
 
 proc getUpdateableRepos(op_args): seq[string] =
+    ## Gets all repositories, that can be updated using git dry runs.
     let
         dirs: seq[string] = op_args
         tempDir: string = getTempDir()
@@ -126,6 +138,7 @@ proc getUpdateableRepos(op_args): seq[string] =
 
 
 proc pullCommand*(op_args) =
+    ## Pull command - pulls changes from origin.
     let dirs: seq[string] = op_args.pick_valid_dirs_or_all().getUpdateableRepos()
 
     # Quit if no valid dirs:
@@ -148,9 +161,8 @@ proc pullCommand*(op_args) =
     status.print_after_pull()
 
 
-#proc installCommand*(op_args) = echo "ToDo!"
-
 proc installCommand*(op_args) =
+    ## Install command - executes install script from installation json-file.
     let
         install_instructions: Table[string, string] = read_install_config_file()
         dirs: seq[string] = op_args.pick_valid_dirs_or_all()
@@ -173,6 +185,7 @@ proc installCommand*(op_args) =
     status.print_after_install()
 
 proc editInstallCommand*(_) =
+    ## Edit install command - edits the install json-file.
     var editor: string
     if existsEnv("EDITOR"): editor =
         getEnv("EDITOR")

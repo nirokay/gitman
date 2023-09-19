@@ -1,3 +1,8 @@
+## gitman -Main executable file
+## ============================
+##
+## This module is the main executable entry point.
+
 import std/[strutils, options]
 import globals, operations_import, error
 

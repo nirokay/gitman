@@ -1,7 +1,14 @@
+## Operation defs module
+## =====================
+##
+## This module contains all `Operation` defenitions. Operations are called
+## by the user by passing arguments like `clone`, `pull`, `install`, ...
+
 import std/options
 import types, procs
 
 proc add(op: Operation) =
+    ## Shortcut for adding operations to the `operations` sequence.
     operations.add(op)
 
 

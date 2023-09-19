@@ -1,3 +1,8 @@
+## Operation types module
+## ======================
+##
+## Contains typedefs and global variables.
+
 import std/[strformat, options]
 import ../error
 
@@ -10,6 +15,7 @@ type Operation* = object
 var operations*: seq[Operation]
 
 proc operation_from_string*(str: string): Option[Operation] =
+    ## Parses command-line arg string to Operation, or not...
     for op in operations:
         # Direct call:
         if op.name == str: return some op
@@ -23,6 +29,7 @@ proc operation_from_string*(str: string): Option[Operation] =
     return none Operation
 
 proc check_valid_range*(op: Operation, operation_args: seq[string]) =
+    ## Checks if the provided args for a command are in the valid range.
     # No-Arg operations handler:
     if op.args_range.isNone():
         if operation_args.len() == 0: return

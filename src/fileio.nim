@@ -1,3 +1,9 @@
+## FileIO module
+## =============
+##
+## This module contains basic file io procs, such as creating
+## directories and getting directory names etc.
+
 import std/[os, strformat, json, tables, terminal]
 import error
 

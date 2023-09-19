@@ -1,3 +1,9 @@
+## Error module
+## ============
+##
+## This module handles errors (by panicing) and removes repetitive
+## printing of error messages.
+
 import std/[strutils, strformat, terminal]
 
 const

@@ -1,4 +1,11 @@
-import std/os
+## Globals
+## =======
+##
+## This module includes a couple of global variables.
+##
+## Most of them are just package information.
+
+from std/os import commandLineParams
 
 const
     PROJECT_NAME*: string = "gitman"
