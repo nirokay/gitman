@@ -28,6 +28,10 @@ Arguments:
 
   **Example:** `gitman install` (executes install instructions on every repository)
 
+* `edit-install`: Edits the installation json-file. Uses the `EDITOR` environment variable for the editor.
+
+  **Example:** `gitman edit-install` (opens the file in your editor)
+
 Some commands may also have aliases, see `help` for more information.
 
 ## Installation
