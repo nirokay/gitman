@@ -117,7 +117,7 @@ proc checkUpdate(repo, tempDir: string): bool =
         stderr.writeLine(&"Failed to remove file '{tempFile}'! Continuing anyways.")
 
 
-proc getUpdateableRepos(op_args): seq[string] =
+proc getUpdatableRepos(op_args): seq[string] =
     ## Gets all repositories, that can be updated using git dry runs.
     let
         dirs: seq[string] = op_args
@@ -139,7 +139,7 @@ proc getUpdateableRepos(op_args): seq[string] =
 
 proc pullCommand*(op_args) =
     ## Pull command - pulls changes from origin.
-    let dirs: seq[string] = op_args.pick_valid_dirs_or_all().getUpdateableRepos()
+    let dirs: seq[string] = op_args.pick_valid_dirs_or_all() # .getUpdatableRepos()
 
     # Quit if no valid dirs:
     if dirs.len() == 0:
