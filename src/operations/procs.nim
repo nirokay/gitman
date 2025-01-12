@@ -3,7 +3,9 @@
 ##
 ## This module contains the logic of the operations commands.
 
-import std/[os, strutils, strformat, options, terminal, tables]
+import std/[os, strutils, strformat, options, terminal, tables, segfaults]
+import taskpools
+from taskpools/flowvars import readyWith
 import ../globals, ../fileio, ../error, types, gitcommands
 
 using
@@ -137,7 +139,7 @@ proc getUpdatableRepos(op_args): seq[string] =
     stdout.flushFile()
 
 
-proc pullCommand*(op_args) =
+proc pullCommandSync*(op_args) =
     ## Pull command - pulls changes from origin.
     let dirs: seq[string] = op_args.pick_valid_dirs_or_all() # .getUpdatableRepos()
 
@@ -160,6 +162,44 @@ proc pullCommand*(op_args) =
     stdout.write("\n")
     status.print_after_pull()
 
+proc pullCommandAsync*(op_args) =
+    ## Pull command - pulls changes from origin.
+    let dirs: seq[string] = op_args.pick_valid_dirs_or_all() # .getUpdatableRepos()
+
+    # Quit if no valid dirs:
+    if dirs.len() == 0:
+        echo "Nothing to do."
+        quit(0)
+
+    # cd into directories and pull changes:
+    proc pullDir(git_repo_path, dir: string): ErrorStatus {.gcsafe.} =
+        echo "Spawned!"
+        try:
+            styledEcho fgYellow, &"Pulling {dir}...", fgDefault
+            setCurrentDir(git_repo_path & dir)
+            if GIT_PULL.execute("&> /dev/null") == 0: result.successes += 1
+            else: result.failures.add(dir)
+        except OSError:
+            result.failures.add(dir)
+        finally:
+            echo "Completed!"
+
+    proc thread_watcher(tasks: Taskpool, git_repo_path: string, dirs: seq[string]): ErrorStatus =
+        var tempResults: seq[Flowvar[ErrorStatus]] = newSeq[Flowvar[ErrorStatus]](dirs.len())
+        for i, dir in dirs:
+            tempResults[i] = tasks.spawn pullDir(git_repo_path, dir)
+        for i, _ in tempResults:
+            let newResult: ErrorStatus = sync tempResults[i]
+            result.successes += newResult.successes
+            result.failures &= newResult.failures
+
+    var tasks: Taskpool = new Taskpool
+    var status: ErrorStatus = tasks.thread_watcher(git_repo_path, dirs)
+    syncAll tasks
+    shutdown tasks
+
+    stdout.write("\n")
+    status.print_after_pull()
 
 proc installCommand*(op_args) =
     ## Install command - executes install script from installation json-file.

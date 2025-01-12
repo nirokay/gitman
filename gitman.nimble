@@ -1,6 +1,6 @@
 # Package
 
-version       = "2.1.1"
+version       = "2.1.2"
 author        = "nirokay"
 description   = "A git-repo manager that lets you easily update multiple git repositories in a specified directory."
 license       = "GPL-3.0-only"
@@ -11,3 +11,4 @@ bin           = @["gitman"]
 # Dependencies
 
 requires "nim >= 2.0.0"
+requires "taskpools"

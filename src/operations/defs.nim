@@ -34,10 +34,18 @@ add Operation(
 
 add Operation(
     name: "pull",
-    desc: "Pulls changes for every git repo.",
+    desc: "Pulls changes for every git repo synchronously.",
     alias: some @["update"],
     args_range: some [0.Natural, 9999.Natural],
-    call: pullCommand
+    call: pullCommandSync
+)
+
+add Operation(
+    name: "async-pull",
+    desc: "Pulls changes for every git repo asynchronously.",
+    alias: some @["async-update"],
+    args_range: some [0.Natural, 9999.Natural],
+    call: pullCommandAsync
 )
 
 add Operation(
