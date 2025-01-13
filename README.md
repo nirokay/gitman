@@ -12,9 +12,13 @@ gitman is a cross-platform manager for git repositories, that are located inside
 
   **Example:** `gitman clone https://github.com/nirokay/gitman https://github.com/nirokay/nirokay`
 
-* `pull`: Pulls every repository's changes, or only the ones which names are provided.
+* `pull`: Pulls every repository's changes, or only the ones which names are provided synchronously.
 
   **Examples:** `gitman pull` (pulls all repos), `gitman pull gitman nirokay` (only pulls gitman and nirokay repo)
+
+* `async-pull`: Pulls every repository's changes, or only the ones which names are provided asynchronously.
+
+  **Examples:** `gitman async-pull` (pulls all repos), `gitman async-pull gitman nirokay` (only pulls gitman and nirokay repo)
 
 * `help`: Displays a help message.
 
