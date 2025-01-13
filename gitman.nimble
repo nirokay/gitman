@@ -1,6 +1,6 @@
 # Package
 
-version       = "2.2.0"
+version       = "2.2.1"
 author        = "nirokay"
 description   = "A git-repo manager that lets you easily update multiple git repositories in a specified directory."
 license       = "GPL-3.0-only"
