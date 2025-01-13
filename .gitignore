@@ -1,8 +1,10 @@
 # Binaries:
-gitman
-src/gitman
-gitman.exe
-src/gitman.exe
+*
+!*/
+!*.*
+!LICENSE
+*.exe
+*.out
 
 # Project Management:
 .vscode
