@@ -84,17 +84,14 @@ proc removeCommand*(op_args) =
 proc pick_valid_dirs_or_all(op_args): seq[string] =
     ## Picks valid dirs from arguments or returns all valid git dirs if none given.
     let valid_dirs: seq[string] = get_valid_git_dirs_names()
-    result =
-        if op_args.len() == 0:
-            # Pull from all:
-            valid_dirs
-        else:
-            # Pull only specified:
-            var additions: seq[string]
-            for dir in op_args:
-                if dir in valid_dirs: result.add(dir)
-            additions
 
+    if op_args.len() == 0:
+        # Pull from all:
+        result = valid_dirs
+    else:
+        # Pull only specified:
+        for dir in op_args:
+            if dir in valid_dirs: result.add(dir)
     return result
 
 proc checkUpdate(repo, tempDir: string): bool =
@@ -139,7 +136,7 @@ proc getUpdatableRepos(op_args): seq[string] =
 
 
 proc pullCommandSync*(op_args) =
-    ## Pull command - pulls changes from origin.
+    ## Pull command - pulls changes from origin synchronously.
     let dirs: seq[string] = op_args.pick_valid_dirs_or_all() # .getUpdatableRepos()
 
     # Quit if no valid dirs:
@@ -162,7 +159,7 @@ proc pullCommandSync*(op_args) =
     status.print_after_pull()
 
 proc pullCommandAsync*(op_args) =
-    ## Pull command - pulls changes from origin.
+    ## Pull command - pulls changes from origin asynchronously.
     let dirs: seq[string] = op_args.pick_valid_dirs_or_all() # .getUpdatableRepos()
 
     # Quit if no valid dirs:
@@ -173,6 +170,8 @@ proc pullCommandAsync*(op_args) =
     # cd into directories and pull changes:
     proc pullDir(git_repo_path, dir: string): ErrorStatus {.gcsafe.} =
         proc printSuccess(success: bool) =
+            # This is a race condition, but i cant use locks... :(
+            # TODO: find a fix for this
             case success:
             of true: stdout.styledWrite fgGreen, "-", fgDefault
             of false: stdout.styledWrite fgRed, "X", fgDefault
@@ -223,11 +222,11 @@ proc installCommand*(op_args) =
 
     var status: ErrorStatus
     for dir, command in install_instructions:
-        let full_dir: string = "$1/$2" % [git_repo_path, dir]
+        let full_dir: string = git_repo_path / dir
         try:
             full_dir.setCurrentDir()
         except OSError as e:
-            echo "Could not set current directory to '$1'. Reason: ($2)" % [full_dir, e.msg]
+            echo &"Could not set current directory to '{full_dir}'. Reason: ({e.msg})"
             continue
 
         let exit_code: int = command.execShellCmd()
@@ -237,24 +236,30 @@ proc installCommand*(op_args) =
 proc editInstallCommand*(_) =
     ## Edit install command - edits the install json-file.
     var editor: string
-    if existsEnv("EDITOR"): editor =
-        getEnv("EDITOR")
+    if existsEnv("EDITOR"):
+        editor = getEnv("EDITOR")
     else:
         stderr.write("No 'EDITOR' environment variable found.\nWith what editor do you want to open the config file? ")
         editor = stdin.readLine()
 
     if editor == "":
-        EDITOR_NOT_EXISTS.handle("Please type a correct executable name or set your 'EDITOR' environment variable!" &
-            (when not(defined windows) or not(defined mingw):
-                "\nYou can do this by adding 'export EDITOR=editor_name' in your profile file (default: ~/.profile)!\n" &
-                "For example: 'export EDITOR=vim', 'export EDITOR=nano'"
+        EDITOR_NOT_EXISTS.handle("Editor variable 'EDITOR' not set or invalid!" &
+            (when not(defined windows) and not(defined mingw):
+                "\nYou can set it by adding 'export EDITOR=editor_name' in your profile file (for example: ~/.profile)!\n" &
+                "For example: 'export EDITOR=vim', 'export EDITOR=micro', 'export EDITOR=nano'"
             else: ""
             )
         )
+        quit(1)
 
-    let exitCode: int = execShellCmd("$1 $2" % [editor, install_json_file])
+    if not install_json_file.fileExists():
+        install_json_file.writeFile("{}")
+
+    let
+        editorCommand: string = &"{editor} {install_json_file}"
+        exitCode: int = execShellCmd(editorCommand)
     echo (
         if exitCode == 0: "Successfully applied changes."
-        else: "Errors encountered. Please double-check if changes were written to disk!"
+        else: &"Errors encountered ('{editorCommand}', exit code {exitCode}).\nPlease double-check if changes were written to disk!"
     )
 
