@@ -194,8 +194,8 @@ proc pullCommandAsync*(op_args) =
 
     proc thread_watcher(tasks: Taskpool, git_repo_path: string, dirs: seq[string]): ErrorStatus =
         var tempResults: seq[Flowvar[ErrorStatus]] = newSeq[Flowvar[ErrorStatus]](dirs.len())
-        stdout.write "[" & ".".repeat(dirs.len()) & "]\r"
-        stdout.write "["
+        stdout.write "Repositories: [" & ".".repeat(dirs.len()) & "]\r"
+        stdout.write "Repositories: ["
         stdout.flushFile()
         for i, dir in dirs:
             tempResults[i] = tasks.spawn pullDir(git_repo_path, dir)

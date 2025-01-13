@@ -1,5 +1,9 @@
 # Changes
 
+## 2.2.0
+
+Added new command `async-pull`, a multithreaded `pull`.
+
 ## 2.1.0
 
 Added support for installation scripts on a repo-to-repo basis.
