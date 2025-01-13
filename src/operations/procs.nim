@@ -3,7 +3,7 @@
 ##
 ## This module contains the logic of the operations commands.
 
-import std/[os, strutils, strformat, options, terminal, tables, segfaults]
+import std/[os, strutils, strformat, options, terminal, tables, algorithm]
 import taskpools
 import ../globals, ../fileio, ../error, types, gitcommands
 
@@ -34,9 +34,39 @@ proc helpCommand*(_) =
     echo text.join("\n\n")
 
 
+proc toList(items_unsorted: seq[string]): string =
+    let
+        width: int = terminalWidth()
+        smallestWidth: int = 50
+        items: seq[string] = items_unsorted.sorted()
+    if width < smallestWidth:
+        stderr.writeLine(&"Terminal windows is smaller than {smallestWidth}, no fancy printout will be done!")
+        return items.join("\n")
+    let
+        itemsPerRow: int = 5
+        oneThSpace: int = 5
+        spacerWidth: int = width div oneThSpace div itemsPerRow
+        itemLength: int = width div itemsPerRow - spacerWidth
+
+    proc cut(item: string): string =
+        if item.len() > itemLength:
+            result = item[0 .. itemLength - 1 - 3] & "..."
+        elif item.len() < itemLength:
+            result = item & repeat(" ", itemLength - item.len())
+        else:
+            result = item
+
+    for i, item in items:
+        stdout.write(item.cut())
+        if i != 0 and i mod itemsPerRow == itemsPerRow - 1:
+            stdout.write("\n")
+        else:
+            stdout.write(repeat(" ", spacerWidth))
+
+
 proc listCommand*(_) =
     ## List command - lists all git repositories in the repo-directory.
-    echo get_valid_git_dirs_names().join("   ")
+    echo get_valid_git_dirs_names().toList()
 
 
 proc cloneCommand*(op_args) =

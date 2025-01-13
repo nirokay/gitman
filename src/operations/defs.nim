@@ -67,6 +67,7 @@ add Operation(
     name: "install",
     desc: "Executes a specified install script for the repository.",
     alias: none seq[string],
+    args_range: some [0.Natural, 9999.Natural],
     call: installCommand
 )
 
