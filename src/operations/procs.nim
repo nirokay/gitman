@@ -173,19 +173,30 @@ proc pullCommandAsync*(op_args) =
 
     # cd into directories and pull changes:
     proc pullDir(git_repo_path, dir: string): ErrorStatus {.gcsafe.} =
-        echo "Spawned!"
+        proc printSuccess(success: bool) =
+            case success:
+            of true: stdout.styledWrite fgGreen, "-", fgDefault
+            of false: stdout.styledWrite fgRed, "X", fgDefault
         try:
-            styledEcho fgYellow, &"Pulling {dir}...", fgDefault
+            #styledEcho fgYellow, &"Pulling {dir}...", fgDefault
             setCurrentDir(git_repo_path & dir)
-            if GIT_PULL.execute("&> /dev/null") == 0: result.successes += 1
-            else: result.failures.add(dir)
+            if GIT_PULL.execute("&> /dev/null") == 0:
+                result.successes += 1
+                printSuccess(true)
+            else:
+                result.failures.add(dir)
+                printSuccess(false)
         except OSError:
             result.failures.add(dir)
+            printSuccess(false)
         finally:
-            echo "Completed!"
+            stdout.flushFile()
 
     proc thread_watcher(tasks: Taskpool, git_repo_path: string, dirs: seq[string]): ErrorStatus =
         var tempResults: seq[Flowvar[ErrorStatus]] = newSeq[Flowvar[ErrorStatus]](dirs.len())
+        stdout.write "[" & ".".repeat(dirs.len()) & "]\r"
+        stdout.write "["
+        stdout.flushFile()
         for i, dir in dirs:
             tempResults[i] = tasks.spawn pullDir(git_repo_path, dir)
         for i, _ in tempResults:
