@@ -9,3 +9,5 @@ fi
 
 ARCH="_$ARCH"
 nimble build -d:release && mv gitman "gitman_${OSTYPE}${ARCH}"
+
+nimble build -d:mingw -d:windows -d:release && mv gitman.exe "gitman_windows_${ARCH}.exe"

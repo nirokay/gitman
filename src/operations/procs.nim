@@ -245,9 +245,10 @@ proc editInstallCommand*(_) =
 
     if editor == "":
         EDITOR_NOT_EXISTS.handle("Please type a correct executable name or set your 'EDITOR' environment variable!" &
-            (when not defined(windows):
+            (when not(defined windows) or not(defined mingw):
                 "\nYou can do this by adding 'export EDITOR=editor_name' in your profile file (default: ~/.profile)!\n" &
                 "For example: 'export EDITOR=vim', 'export EDITOR=nano'"
+            else: ""
             )
         )
 
