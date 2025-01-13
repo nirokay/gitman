@@ -6,7 +6,7 @@ gitman is a cross-platform manager for git repositories, that are located inside
 
 ## Usage
 
-Arguments:
+### Arguments
 
 * `clone [url: string]`: Clones one or more git repositories to the git repository directory. (urls seperated by spaces)
 
@@ -24,7 +24,7 @@ Arguments:
 
 * `list`: Lists all git repositories.
 
-* `install`: Executes installation commands specified in the installation json file (defualt: `$GITMAN_REPOS_LOCATION/.gitman-install.json`).
+* `install`: Executes installation commands specified in the installation json file (default: `$GITMAN_REPOS_LOCATION/.gitman-install.json`).
 
   **Example:** `gitman install` (executes install instructions on every repository)
 
@@ -33,6 +33,22 @@ Arguments:
   **Example:** `gitman edit-install` (opens the file in your editor)
 
 Some commands may also have aliases, see `help` for more information.
+
+### Automatic installation
+
+gitman supports automatic installations with `gitman install` for specified repositories (installations instructions by default in
+`$GITMAN_REPOS_LOCATION/.gitman-install.json`).
+
+This is the JSON format:
+
+```json
+{
+    "gitman": "nimble build -d:release && nimble install"
+}
+```
+
+This will automatically `cd` into every directory and execute the command, the instructions above would install gitman, when the gitman
+repository is cloned to `$GITMAN_REPOS_LOCATION/gitman/`.
 
 ## Installation
 
@@ -94,7 +110,7 @@ Any operating system that is supported by the [nim programming language](https:/
 
 This program was tested on GNU/Linux (Manjaro) and Windows 10 (64 bit).
 
-## Dependancies
+## Dependencies
 
 * [git](https://git-scm.com/)
 
