@@ -5,7 +5,6 @@
 
 import std/[os, strutils, strformat, options, terminal, tables, segfaults]
 import taskpools
-from taskpools/flowvars import readyWith
 import ../globals, ../fileio, ../error, types, gitcommands
 
 using
@@ -23,7 +22,7 @@ proc helpCommand*(_) =
             &"   {op.desc}"
         ]
         if op.alias.isSome():
-            temp.add(&"   Also:\n   ↳ " & op.alias.get().join(", "))  # weird mish-mash of syntax because my highliter was weird
+            temp.add(&"   Also:\n   ↳ " & op.alias.get().join(", "))  # weird mish-mash of syntax because my highlighter was weird
         text.add(temp.join("\n"))
 
     echo @[
