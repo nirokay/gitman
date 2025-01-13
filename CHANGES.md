@@ -1,5 +1,9 @@
 # Changes
 
+## 2.2.1
+
+`list` command printout reworked and some small bugfixes.
+
 ## 2.2.0
 
 Added new command `async-pull`, a multithreaded `pull`.
