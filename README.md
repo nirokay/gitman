@@ -8,7 +8,7 @@ gitman is a cross-platform manager for git repositories, that are located inside
 
 ### Arguments
 
-* `clone [url: string]`: Clones one or more git repositories to the git repository directory. (urls seperated by spaces)
+* `clone [url: string]`: Clones one or more git repositories to the git repository directory. (urls separated by spaces)
 
   **Example:** `gitman clone https://github.com/nirokay/gitman https://github.com/nirokay/nirokay`
 
@@ -18,7 +18,7 @@ gitman is a cross-platform manager for git repositories, that are located inside
 
 * `help`: Displays a help message.
 
-* `remove [dir: string]`: Removes the specified directory inside the git-repo directory. Can accept mutliple directories to remove.
+* `remove [dir: string]`: Removes the specified directory inside the git-repo directory. Can accept multiple directories to remove.
 
   **Example:** `gitman remove nirokay gitman`
 

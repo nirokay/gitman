@@ -1,7 +1,7 @@
 ## Operation defs module
 ## =====================
 ##
-## This module contains all `Operation` defenitions. Operations are called
+## This module contains all `Operation` definitions. Operations are called
 ## by the user by passing arguments like `clone`, `pull`, `install`, ...
 
 import std/options
