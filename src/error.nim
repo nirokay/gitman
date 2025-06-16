@@ -7,21 +7,21 @@
 import std/[strutils, strformat, terminal]
 
 const
-    help_io_text: string = "\nPlease check if you have needed permissions."
-    see_help_text: string = "\nSee `help` for a list of valid args."
+    helpIoText: string = "\nPlease check if you have needed permissions."
+    seeHelpText: string = "\nSee `help` for a list of valid args."
 
 type
     ErrorType* = enum
-        IO_FAILURE = "Failed to read/write from/to disk." & help_io_text,
-        READ_ERROR = "Failed to read from disk." & help_io_text,
-        WRITE_ERROR = "Failed to write to disk." & help_io_text,
+        IO_FAILURE = "Failed to read/write from/to disk." & helpIoText,
+        READ_ERROR = "Failed to read from disk." & helpIoText,
+        WRITE_ERROR = "Failed to write to disk." & helpIoText,
         UNAVAILABLE_TEMP_FILENAMES = "Too many temporary files exist. Please consider removing some.",
         TEMP_DIR_UNAVAILABLE = "Failed to get temporary directory.",
 
         EDITOR_NOT_EXISTS = "The provided editor does not exist or is not in path.",
 
-        OPERATION_NONE = "No arguments provided." & see_help_text,
-        OPERATION_UNKNOWN = "Invalid argument." & see_help_text,
+        OPERATION_NONE = "No arguments provided." & seeHelpText,
+        OPERATION_UNKNOWN = "Invalid argument." & seeHelpText,
 
         INVALID_ARGUMENTS_AMOUNT = "Invalid amounts of arguments."
     ErrorStatus* = object
@@ -48,14 +48,14 @@ proc print(error: ErrorStatus, success_message, error_message: string) =
         styledEcho fgRed, &"Failed {error_message}:", fgDefault
         echo "\t" & error.failures.join("\n\t")
 
-proc print_after_clone*(error: ErrorStatus) =
+proc printAfterClone*(error: ErrorStatus) =
     error.print("clones", &"to clone from following {error.failures.len()} repositories")
 
-proc print_after_pull*(error: ErrorStatus) =
+proc printAfterPull*(error: ErrorStatus) =
     error.print("pulls", &"to pull changes from following {error.failures.len()} repositories")
 
-proc print_after_remove*(error: ErrorStatus) =
+proc printAfterRemove*(error: ErrorStatus) =
     error.print("removes", &"to remove following {error.failures.len()} repositories")
 
-proc print_after_install*(error: ErrorStatus) =
+proc printAfterInstall*(error: ErrorStatus) =
     error.print("installs", &"to install following {error.failures.len()} repositories")

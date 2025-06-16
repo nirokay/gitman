@@ -8,7 +8,7 @@ import taskpools
 import ../globals, ../fileio, ../error, types, gitcommands
 
 using
-    op_args: seq[string]
+    opArgs: seq[string]
     _: seq[string]
 
 
@@ -34,11 +34,11 @@ proc helpCommand*(_) =
     echo text.join("\n\n")
 
 
-proc toList(items_unsorted: seq[string]): string =
+proc toList(itemsUnsorted: seq[string]): string =
     let
         width: int = terminalWidth()
         smallestWidth: int = 50
-        items: seq[string] = items_unsorted.sorted()
+        items: seq[string] = itemsUnsorted.sorted()
     if width < smallestWidth:
         stderr.writeLine(&"Terminal windows is smaller than {smallestWidth}, no fancy printout will be done!")
         return items.join("\n")
@@ -66,38 +66,38 @@ proc toList(items_unsorted: seq[string]): string =
 
 proc listCommand*(_) =
     ## List command - lists all git repositories in the repo-directory.
-    echo get_valid_git_dirs_names().toList()
+    echo getValidGitDirsNames().toList()
 
 
-proc cloneCommand*(op_args) =
+proc cloneCommand*(opArgs) =
     ## Clone command - clones a repository into the repo-directory.
     var status: ErrorStatus
 
-    git_repo_path.setCurrentDir()
-    for repo in op_args:
+    gitRepoPath.setCurrentDir()
+    for repo in opArgs:
         let succ: int = GIT_CLONE.execute(repo)
         # Save successes and failures:
         if succ == 0: status.successes += 1
         else: status.failures.add(repo)
 
     stdout.write "\n"
-    status.print_after_clone()
+    status.printAfterClone()
 
 
-proc removeCommand*(op_args) =
+proc removeCommand*(opArgs) =
     ## Remove command - removes a repository from the repo-directory.
-    let valid_dirs: seq[string] = get_valid_git_dirs_names()
-    var dirs_to_delete: seq[string]
-    for dir in op_args:
-        if dir in valid_dirs: dirs_to_delete.add(dir)
+    let validDirs: seq[string] = getValidGitDirsNames()
+    var dirsToDelete: seq[string]
+    for dir in opArgs:
+        if dir in validDirs: dirsToDelete.add(dir)
 
-    if dirs_to_delete.len() == 0:
+    if dirsToDelete.len() == 0:
         echo "No directories found with matching names."
         quit(1)
 
     # Ask for confirmation:
-    styledEcho fgRed, &"You are about to remove these {dirs_to_delete.len()} repositories:", fgDefault
-    echo dirs_to_delete.join(", ")
+    styledEcho fgRed, &"You are about to remove these {dirsToDelete.len()} repositories:", fgDefault
+    echo dirsToDelete.join(", ")
     stdout.styledWrite fgRed, &"This cannot be undone. Are you sure you want to proceed?", fgDefault, " [y/N] "
     let confirm: char = getch()
     stdout.write("\n")
@@ -106,22 +106,22 @@ proc removeCommand*(op_args) =
         quit(1)
 
     # Remove dirs:
-    let status: ErrorStatus = remove_git_dirs(dirs_to_delete)
+    let status: ErrorStatus = removeGitDirs(dirsToDelete)
     stdout.write("\n")
-    status.print_after_remove()
+    status.printAfterRemove()
 
 
-proc pick_valid_dirs_or_all(op_args): seq[string] =
+proc pickValidDirsOrAll(opArgs): seq[string] =
     ## Picks valid dirs from arguments or returns all valid git dirs if none given.
-    let valid_dirs: seq[string] = get_valid_git_dirs_names()
+    let validDirs: seq[string] = getValidGitDirsNames()
 
-    if op_args.len() == 0:
+    if opArgs.len() == 0:
         # Pull from all:
-        result = valid_dirs
+        result = validDirs
     else:
         # Pull only specified:
-        for dir in op_args:
-            if dir in valid_dirs: result.add(dir)
+        for dir in opArgs:
+            if dir in validDirs: result.add(dir)
     return result
 
 proc checkUpdate(repo, tempDir: string): bool =
@@ -145,10 +145,10 @@ proc checkUpdate(repo, tempDir: string): bool =
         stderr.writeLine(&"Failed to remove file '{tempFile}'! Continuing anyways.")
 
 
-proc getUpdatableRepos(op_args): seq[string] =
+proc getUpdatableRepos(opArgs): seq[string] =
     ## Gets all repositories, that can be updated using git dry runs.
     let
-        dirs: seq[string] = op_args
+        dirs: seq[string] = opArgs
         tempDir: string = getTempDir()
     if not tempDir.dirExists():
         TEMP_DIR_UNAVAILABLE.handle(&"Could not get '{tempDir}'...")
@@ -165,9 +165,9 @@ proc getUpdatableRepos(op_args): seq[string] =
     stdout.flushFile()
 
 
-proc pullCommandSync*(op_args) =
+proc pullCommandSync*(opArgs) =
     ## Pull command - pulls changes from origin synchronously.
-    let dirs: seq[string] = op_args.pick_valid_dirs_or_all() # .getUpdatableRepos()
+    let dirs: seq[string] = opArgs.pickValidDirsOrAll() # .getUpdatableRepos()
 
     # Quit if no valid dirs:
     if dirs.len() == 0:
@@ -179,18 +179,18 @@ proc pullCommandSync*(op_args) =
     for dir in dirs:
         try:
             styledEcho fgYellow, &"Pulling {dir}...", fgDefault
-            setCurrentDir(git_repo_path & dir)
+            setCurrentDir(gitRepoPath & dir)
             if GIT_PULL.execute() == 0: status.successes += 1
             else: status.failures.add(dir)
         except OSError:
             status.failures.add(dir)
 
     stdout.write("\n")
-    status.print_after_pull()
+    status.printAfterPull()
 
-proc pullCommandAsync*(op_args) =
+proc pullCommandAsync*(opArgs) =
     ## Pull command - pulls changes from origin asynchronously.
-    let dirs: seq[string] = op_args.pick_valid_dirs_or_all() # .getUpdatableRepos()
+    let dirs: seq[string] = opArgs.pickValidDirsOrAll() # .getUpdatableRepos()
 
     # Quit if no valid dirs:
     if dirs.len() == 0:
@@ -198,7 +198,7 @@ proc pullCommandAsync*(op_args) =
         quit(0)
 
     # cd into directories and pull changes:
-    proc pullDir(git_repo_path, dir: string): ErrorStatus {.gcsafe.} =
+    proc pullDir(gitRepoPath, dir: string): ErrorStatus {.gcsafe.} =
         proc printSuccess(success: bool) =
             # This is a race condition, but i cant use locks... :(
             # TODO: find a fix for this
@@ -207,7 +207,7 @@ proc pullCommandAsync*(op_args) =
             of false: stdout.styledWrite fgRed, "X", fgDefault
         try:
             #styledEcho fgYellow, &"Pulling {dir}...", fgDefault
-            setCurrentDir(git_repo_path & dir)
+            setCurrentDir(gitRepoPath & dir)
             if GIT_PULL.execute("&> /dev/null") == 0:
                 result.successes += 1
                 printSuccess(true)
@@ -220,48 +220,48 @@ proc pullCommandAsync*(op_args) =
         finally:
             stdout.flushFile()
 
-    proc thread_watcher(tasks: Taskpool, git_repo_path: string, dirs: seq[string]): ErrorStatus =
+    proc threadWatcher(tasks: Taskpool, gitRepoPath: string, dirs: seq[string]): ErrorStatus =
         var tempResults: seq[Flowvar[ErrorStatus]] = newSeq[Flowvar[ErrorStatus]](dirs.len())
         stdout.write "Repositories: [" & ".".repeat(dirs.len()) & "]\r"
         stdout.write "Repositories: ["
         stdout.flushFile()
         for i, dir in dirs:
-            tempResults[i] = tasks.spawn pullDir(git_repo_path, dir)
+            tempResults[i] = tasks.spawn pullDir(gitRepoPath, dir)
         for i, _ in tempResults:
             let newResult: ErrorStatus = sync tempResults[i]
             result.successes += newResult.successes
             result.failures &= newResult.failures
 
     var tasks: Taskpool = new Taskpool
-    var status: ErrorStatus = tasks.thread_watcher(git_repo_path, dirs)
+    var status: ErrorStatus = tasks.threadWatcher(gitRepoPath, dirs)
     syncAll tasks
     shutdown tasks
 
     stdout.write("\n")
-    status.print_after_pull()
+    status.printAfterPull()
 
-proc installCommand*(op_args) =
+proc installCommand*(opArgs) =
     ## Install command - executes install script from installation json-file.
     let
-        install_instructions: Table[string, string] = read_install_config_file()
-        dirs: seq[string] = op_args.pick_valid_dirs_or_all()
+        installInstructions: Table[string, string] = readInstallConfigFile()
+        dirs: seq[string] = opArgs.pickValidDirsOrAll()
 
     if dirs.len() == 0:
-        echo &"Nothing to do. No valid install commands found in '{install_json_file}'..."
+        echo &"Nothing to do. No valid install commands found in '{installJsonFile}'..."
         quit(1)
 
     var status: ErrorStatus
-    for dir, command in install_instructions:
-        let full_dir: string = git_repo_path / dir
+    for dir, command in installInstructions:
+        let fullDir: string = gitRepoPath / dir
         try:
-            full_dir.setCurrentDir()
+            fullDir.setCurrentDir()
         except OSError as e:
-            echo &"Could not set current directory to '{full_dir}'. Reason: ({e.msg})"
+            echo &"Could not set current directory to '{fullDir}'. Reason: ({e.msg})"
             continue
 
-        let exit_code: int = command.execShellCmd()
-        status.add(dir, exit_code)
-    status.print_after_install()
+        let exitCode: int = command.execShellCmd()
+        status.add(dir, exitCode)
+    status.printAfterInstall()
 
 proc editInstallCommand*(_) =
     ## Edit install command - edits the install json-file.
@@ -282,14 +282,13 @@ proc editInstallCommand*(_) =
         )
         quit(1)
 
-    if not install_json_file.fileExists():
-        install_json_file.writeFile("{}")
+    if not installJsonFile.fileExists():
+        installJsonFile.writeFile("{}")
 
     let
-        editorCommand: string = &"{editor} {install_json_file}"
+        editorCommand: string = &"{editor} {installJsonFile}"
         exitCode: int = execShellCmd(editorCommand)
     echo (
         if exitCode == 0: "Successfully applied changes."
         else: &"Errors encountered ('{editorCommand}', exit code {exitCode}).\nPlease double-check if changes were written to disk!"
     )
-
