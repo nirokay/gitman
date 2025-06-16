@@ -3,7 +3,7 @@
 ##
 ## This module contains the logic of the operations commands.
 
-import std/[os, strutils, strformat, options, terminal, tables, algorithm]
+import std/[os, osproc, strutils, strformat, options, terminal, tables, algorithm]
 import taskpools
 import ../globals, ../fileio, ../error, types, gitcommands
 
@@ -75,10 +75,10 @@ proc cloneCommand*(opArgs) =
 
     gitRepoPath.setCurrentDir()
     for repo in opArgs:
-        let succ: int = GIT_CLONE.execute(repo)
+        let (succ, output) = GIT_CLONE.execute(repo)
         # Save successes and failures:
         if succ == 0: status.successes += 1
-        else: status.failures.add(repo)
+        else: status.failures.add([repo, output])
 
     stdout.write "\n"
     status.printAfterClone()
@@ -128,7 +128,7 @@ proc checkUpdate(repo, tempDir: string): bool =
     ## Checks if a repository is updatable with git dry run.
     # TODO: Implement and make it actually work...
     var tempFile: string = tempDir & "gitmanupdatecheck.temp"
-    let status: int = GIT_CHECK_UPDATES.execute(&"&> {tempFile}")
+    let (status, output) = GIT_CHECK_UPDATES.execute()
 
     # stderr.writeLine "\nFile: " & readFile(tempFile) & "\n"
     # stderr.flushFile()
@@ -180,10 +180,11 @@ proc pullCommandSync*(opArgs) =
         try:
             styledEcho fgYellow, &"Pulling {dir}...", fgDefault
             setCurrentDir(gitRepoPath & dir)
-            if GIT_PULL.execute() == 0: status.successes += 1
-            else: status.failures.add(dir)
+            let (succ, output) = GIT_PULL.execute()
+            if succ == 0: status.successes += 1
+            else: status.failures.add([dir, output])
         except OSError:
-            status.failures.add(dir)
+            status.failures.add([dir, "OSError"])
 
     stdout.write("\n")
     status.printAfterPull()
@@ -208,14 +209,15 @@ proc pullCommandAsync*(opArgs) =
         try:
             #styledEcho fgYellow, &"Pulling {dir}...", fgDefault
             setCurrentDir(gitRepoPath & dir)
-            if GIT_PULL.execute("&> /dev/null") == 0:
+            let (status, output) = GIT_PULL.execute()
+            if status == 0:
                 result.successes += 1
                 printSuccess(true)
             else:
-                result.failures.add(dir)
+                result.failures.add([dir, output])
                 printSuccess(false)
         except OSError:
-            result.failures.add(dir)
+            result.failures.add([dir, "OSError"])
             printSuccess(false)
         finally:
             stdout.flushFile()
@@ -259,8 +261,9 @@ proc installCommand*(opArgs) =
             echo &"Could not set current directory to '{fullDir}'. Reason: ({e.msg})"
             continue
 
-        let exitCode: int = command.execShellCmd()
-        status.add(dir, exitCode)
+        let (output, succ) = command.execCmdEx()
+        if succ == 0: status.successes += 1
+        else: status.failures.add([dir, output])
     status.printAfterInstall()
 
 proc editInstallCommand*(_) =

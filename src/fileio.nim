@@ -58,7 +58,7 @@ proc removeGitDirs*(dirs: seq[string]): ErrorStatus =
             removeDir(gitRepoPath & dir)
             result.successes += 1
         except OSError:
-            result.failures.add(dir)
+            result.failures.add([dir, "OSError"])
 
 proc initInstallJson() =
     ## Makes sure the file for gitman installations is present.

@@ -26,12 +26,7 @@ type
         INVALID_ARGUMENTS_AMOUNT = "Invalid amounts of arguments."
     ErrorStatus* = object
         successes*: int
-        failures*: seq[string]
-
-
-proc add*(status: var ErrorStatus, dir: string, exit_code: int) =
-    if exit_code == 0: status.successes += 1
-    else: status.failures.add(dir)
+        failures*: seq[array[2, string]]
 
 
 proc handle*(error: ErrorType, msg: string = "(none provided)") =
@@ -46,7 +41,12 @@ proc print(error: ErrorStatus, success_message, error_message: string) =
     styledEcho fgGreen, &"Successful {success_message}: {error.successes}", fgDefault
     if error.failures.len() != 0:
         styledEcho fgRed, &"Failed {error_message}:", fgDefault
-        echo "\t" & error.failures.join("\n\t")
+        for info in error.failures:
+            let
+                repository: string = info[0]
+                reason: string = info[1]
+            styledEcho fgYellow, &" * Repository '{repository}', reason being:", fgDefault
+            styledEcho reason.strip().indent(5), "\n"
 
 proc printAfterClone*(error: ErrorStatus) =
     error.print("clones", &"to clone from following {error.failures.len()} repositories")
