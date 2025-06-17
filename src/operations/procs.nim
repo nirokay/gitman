@@ -22,7 +22,7 @@ proc helpCommand*(_) =
             &"   {op.desc}"
         ]
         if op.alias.isSome():
-            temp.add(&"   Also:\n   ↳ " & op.alias.get().join(", "))  # weird mish-mash of syntax because my highlighter was weird
+            temp.add(&"   Command aliases:\n   ↳ " & op.alias.get().join(", "))  # weird mish-mash of syntax because my highlighter was weird
         text.add(temp.join("\n"))
 
     echo @[
@@ -31,7 +31,12 @@ proc helpCommand*(_) =
         &"Source: {PROJECT_WEBSITE}"
     ].join("\n")
     echo "\nArguments:"
-    echo text.join("\n\n")
+    echo text.join("\n\n").indent(4)
+
+
+proc versionCommand*(_) =
+    echo &"{PROJECT_NAME} v{PROJECT_VERSION}"
+    echo &"Compiled with Nim v{PROJECT_COMPILE_NIM_VERSION} at {PROJECT_COMPILE_TIME}"
 
 
 proc toList(itemsUnsorted: seq[string]): string =
@@ -62,7 +67,6 @@ proc toList(itemsUnsorted: seq[string]): string =
             stdout.write("\n")
         else:
             stdout.write(repeat(" ", spacerWidth))
-
 
 proc listCommand*(_) =
     ## List command - lists all git repositories in the repo-directory.
@@ -124,46 +128,6 @@ proc pickValidDirsOrAll(opArgs): seq[string] =
             if dir in validDirs: result.add(dir)
     return result
 
-proc checkUpdate(repo, tempDir: string): bool =
-    ## Checks if a repository is updatable with git dry run.
-    # TODO: Implement and make it actually work...
-    var tempFile: string = tempDir & "gitmanupdatecheck.temp"
-    let (status, output) = GIT_CHECK_UPDATES.execute()
-
-    # stderr.writeLine "\nFile: " & readFile(tempFile) & "\n"
-    # stderr.flushFile()
-
-    if status != 0:
-        stderr.writeLine(&"Errors with dryrun (exit code {status}):\n{tempFile.readFile()}")
-    else:
-        # Check length of git output (shitty implementation but it works i guess):
-        if tempFile.readFile().len() > 2: result = true
-
-    try:
-        tempFile.removeFile()
-    except OSError:
-        stderr.writeLine(&"Failed to remove file '{tempFile}'! Continuing anyways.")
-
-
-proc getUpdatableRepos(opArgs): seq[string] =
-    ## Gets all repositories, that can be updated using git dry runs.
-    let
-        dirs: seq[string] = opArgs
-        tempDir: string = getTempDir()
-    if not tempDir.dirExists():
-        TEMP_DIR_UNAVAILABLE.handle(&"Could not get '{tempDir}'...")
-
-    var currentDir: int
-    for repo in dirs:
-        if repo.checkUpdate(tempDir): result.add(repo)
-
-        # Little progress meter:
-        currentDir.inc()
-        stdout.write("\rChecking for updates... " & $(currentDir / dirs.len() * 100).formatFloat(precision = 4) & "%")
-        stdout.flushFile()
-    stdout.write "\n"
-    stdout.flushFile()
-
 
 proc pullCommandSync*(opArgs) =
     ## Pull command - pulls changes from origin synchronously.
@@ -188,6 +152,7 @@ proc pullCommandSync*(opArgs) =
 
     stdout.write("\n")
     status.printAfterPull()
+
 
 proc pullCommandAsync*(opArgs) =
     ## Pull command - pulls changes from origin asynchronously.
@@ -242,6 +207,7 @@ proc pullCommandAsync*(opArgs) =
     stdout.write("\n")
     status.printAfterPull()
 
+
 proc installCommand*(opArgs) =
     ## Install command - executes install script from installation json-file.
     let
@@ -266,17 +232,18 @@ proc installCommand*(opArgs) =
         else: status.failures.add([dir, output])
     status.printAfterInstall()
 
+
 proc editInstallCommand*(_) =
     ## Edit install command - edits the install json-file.
     var editor: string
     if existsEnv("EDITOR"):
         editor = getEnv("EDITOR")
     else:
-        stderr.write("No 'EDITOR' environment variable found.\nWith what editor do you want to open the config file? ")
+        stderr.write("No 'EDITOR' environment variable found.\nType the wished editor program name: ")
         editor = stdin.readLine()
 
     if editor == "":
-        EDITOR_NOT_EXISTS.handle("Editor variable 'EDITOR' not set or invalid!" &
+        EDITOR_NOT_EXISTS.handleUsage("Editor variable 'EDITOR' not set or invalid!" &
             (when not(defined windows) and not(defined mingw):
                 "\nYou can set it by adding 'export EDITOR=editor_name' in your profile file (for example: ~/.profile)!\n" &
                 "For example: 'export EDITOR=vim', 'export EDITOR=micro', 'export EDITOR=nano'"

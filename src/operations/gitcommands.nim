@@ -6,7 +6,7 @@
 
 import std/[osproc, strutils, strformat]
 
-const git_executable: string =
+const gitExecutable: string =
     when defined(windows): "git.exe"
     else: "git"
 
@@ -19,6 +19,6 @@ proc execute*(command: GitCommand, args: string = ""): (int, string) =
     ## Runs `git [command] ?[args]` in shell.
     ##
     ## Returns the status code and command output.
-    let fullCommand = strip(&"{git_executable} {$command} {args}")
+    let fullCommand = strip(&"{gitExecutable} {$command} {args}")
     let (output, exit) = fullCommand.execCmdEx()
     return (exit, output)

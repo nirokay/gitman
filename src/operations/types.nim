@@ -9,7 +9,7 @@ import ../error
 type Operation* = object
     name*, desc*: string
     alias*: Option[seq[string]]
-    args_range*: Option[array[2, Natural]]
+    argsRange*: Option[array[2, Natural]]
     call*: proc(opArgs: seq[string])
 
 var operations*: seq[Operation]
@@ -31,11 +31,11 @@ proc operationFromString*(str: string): Option[Operation] =
 proc checkValidRange*(op: Operation, operationArgs: seq[string]) =
     ## Checks if the provided args for a command are in the valid range.
     # No-Arg operations handler:
-    if op.args_range.isNone():
+    if op.argsRange.isNone():
         if operationArgs.len() == 0: return
-        else: INVALID_ARGUMENTS_AMOUNT.handle(&"No arguments expected, got {operationArgs.len()} instead.")
+        else: INVALID_ARGUMENTS_AMOUNT.handleUsage(&"No arguments expected, got {operationArgs.len()} instead.")
 
     # Set-Arg operations handler:
-    let r: array[2, Natural] = op.args_range.get()
+    let r: array[2, Natural] = op.argsRange.get()
     if operationArgs.len() notin r[0]..r[1]:
-        INVALID_ARGUMENTS_AMOUNT.handle(&"Expected between {r[0]} and {r[1]} arguments, got {operationArgs.len()} instead.")
+        INVALID_ARGUMENTS_AMOUNT.handleUsage(&"Expected between {r[0]} and {r[1]} arguments, got {operationArgs.len()} instead.")

@@ -36,7 +36,7 @@ proc confirmRepoDir*() =
         if not gitRepoPath.dirExists():
             gitRepoPath.createDir()
     except OSError:
-        WRITE_ERROR.handle(gitRepoPath)
+        WRITE_ERROR.handleException(gitRepoPath)
 
 
 proc getValidGitDirsPaths*(): seq[string] =
@@ -69,8 +69,8 @@ proc readInstallConfigFile*(): Table[string, string] =
     initInstallJson()
     var jsonInstall: JsonNode
     try:
-        let raw_json: string = installJsonFile.readFile()
-        jsonInstall = raw_json.parseJson()
+        let rawJson: string = installJsonFile.readFile()
+        jsonInstall = rawJson.parseJson()
     except JsonParsingError:
         styledEcho fgRed, &"Failed to parse '{installJsonFile}' json file. Is it valid json?", fgDefault
         quit(1)

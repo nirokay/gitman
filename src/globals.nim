@@ -5,14 +5,19 @@
 ##
 ## Most of them are just package information.
 
-from std/os import commandLineParams
-
+# Project information:
 const
     PROJECT_NAME*: string = "gitman"
-    PROJECT_VERSION*: string = "2.3.0"
+    PROJECT_VERSION*: string = "2.3.1"
     PROJECT_WEBSITE*: string = "https://github.com/nirokay/gitman/"
     PROJECT_DESCRIPTION*: string = "A git-repo manager that lets you easily update multiple git repositories in a specified directory."
     PROJECT_AUTHORS*: seq[string] = @["nirokay"]
 
-let
-    args*: seq[string] = commandLineParams()
+# Compilation information:
+const
+    PROJECT_COMPILE_TIME* {.strdefine.}: string = "unspecified time"
+    PROJECT_COMPILE_NIM_VERSION*: string = NimVersion
+
+# Arguments:
+from std/os import commandLineParams
+let args*: seq[string] = commandLineParams() ## Runtime arguments
