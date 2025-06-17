@@ -16,3 +16,4 @@ function compile() {
 
 compile && mv gitman "gitman_${OSTYPE}${ARCH}"
 compile -d:mingw -d:windows && mv gitman.exe "gitman_windows${ARCH}.exe"
+# compile --os:android && mv gitman "gitman_android" # why? amazing!
