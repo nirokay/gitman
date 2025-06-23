@@ -1,5 +1,17 @@
 # Changes
 
+## 2.3.1
+
+* Fixes to grammar and other text stuff
+* Added version command
+* Added more aliases for certain commands
+* Build script strips debug information from executable for smaller binaries
+
+
+## 2.3.0
+
+Printout of git error message upon failure of git operation.
+
 ## 2.2.1
 
 `list` command printout reworked and some small bugfixes.

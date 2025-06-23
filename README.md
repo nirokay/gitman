@@ -109,6 +109,12 @@ export GITMAN_REPOS_LOCATION="$HOME/Git"
 
 This will only be available for the current session. Consider putting the string above into your profile/shell rc file.
 
+## Autocompletions
+
+**Supported shells:**
+
+* ZSH
+
 ## Changes
 
 See [Changes](CHANGES.md) document.
