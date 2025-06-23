@@ -1,6 +1,7 @@
 import std/[os, strutils, strformat, algorithm, sugar]
 import ../src/operations/types
 import ../src/operations/defs
+export types, defs
 
 const compDir: string = "shell-completions"
 
@@ -48,4 +49,4 @@ for op in operationsSorted:
 
 completeZsh.replaced(keywordCommands, linesZsh.join("\n").indent(8))
 
-writeFile(compDir / "gitman_zsh_compdef", completeZsh)
+writeFile(compDir / "gitman_complete.zsh.sh", completeZsh)

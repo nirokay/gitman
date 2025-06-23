@@ -113,7 +113,7 @@ This will only be available for the current session. Consider putting the string
 
 **Supported shells:**
 
-* [ZSH](./shell-completions/gitman_zsh_compdef)
+* [ZSH](./shell-completions/gitman_complete.zsh.sh)
 
 ## Changes
 
