@@ -1,8 +1,8 @@
 # gitman - Git Repository Manager
 
-Have you been cloning git repositories left and right? Do you wish to keep them automatically up-to date?
+Have you been cloning git repositories left and right? Do you wish to keep them automatically up-to date, run automated scripts on them?
 
-gitman is a cross-platform manager for git repositories, that are located inside a single directory.
+gitman is a cross-platform manager for git repositories, that are located inside a single directory or are symlinked to it.
 
 ## Usage
 
@@ -22,6 +22,8 @@ gitman is a cross-platform manager for git repositories, that are located inside
 
 * `help`: Displays a help message.
 
+* `version`: Displays version and compilation information.
+
 * `remove [dir: string]`: Removes the specified directory inside the git-repo directory. Can accept multiple directories to remove.
 
   **Example:** `gitman remove nirokay gitman`
@@ -40,19 +42,22 @@ Some commands may also have aliases, see `help` for more information.
 
 ### Automatic installation
 
-gitman supports automatic installations with `gitman install` for specified repositories (installations instructions by default in
+gitman supports automatic installations with `gitman install` for specified repositories (installation instructions by default in
 `$GITMAN_REPOS_LOCATION/.gitman-install.json`).
 
-This is the JSON format:
+This is the JSON format `[repositoryName: string] -> [shellCommandToExecute: string]`:
 
 ```json
 {
-    "gitman": "nimble build -d:release && nimble install"
+    "gitman": "nimble build -d:release && nimble install",
+    "nirokay": "echo -e \"Imagine this is something useful\!\""
 }
 ```
 
 This will automatically `cd` into every directory and execute the command, the instructions above would install gitman, when the gitman
 repository is cloned to `$GITMAN_REPOS_LOCATION/gitman/`.
+
+Of course you can use this feature for other things, such as running scripts, validating files, etc. - Anything you want to have automated!
 
 ## Installation
 
@@ -74,11 +79,11 @@ You can also set some compile-time flags to customise your the program to your l
 
 **List of compile-time flags:**
 
-* `environment_variable` (default: `GITMAN_REPOS_LOCATION`)
+* `environmentVariable` (default: `GITMAN_REPOS_LOCATION`)
 
   This sets the environment variable the program uses.
 
-* `gitman_install_file` (default: `.gitman-install.json`)
+* `gitmanInstallFile` (default: `.gitman-install.json`)
 
   Changes the installation json-file name.
 
@@ -86,9 +91,9 @@ You can also set some compile-time flags to customise your the program to your l
 
 When compiling add the `-d:` flag. For example:
 
-* `nimble build -d:environment_variable:NEW_ENV_VARIABLE`
-* `nimble build -d:gitman_install_file:new_file_name.json`
-* `nimble build -d:environment_variable:NEW_ENV_VARIABLE -d:gitman_install_file:new_file_name.json`
+* `nimble build -d:environmentVariable:NEW_ENV_VARIABLE`
+* `nimble build -d:gitmanInstallFile:new_file_name.json`
+* `nimble build -d:environmentVariable:NEW_ENV_VARIABLE -d:gitmanInstallFile:new_file_name.json`
 
 ## Configuration
 
@@ -112,10 +117,9 @@ See [Changes](CHANGES.md) document.
 
 Any operating system that is supported by the [nim programming language](https://nim-lang.org) should be supported.
 
-This program was tested on GNU/Linux (Manjaro) and Windows 10 (64 bit).
+This program was tested on GNU/Linux (OpenSUSE, Ubuntu, Manjaro) and Windows 10 (64 bit).
 
 ## Dependencies
 
 * [git](https://git-scm.com/)
-
 * [Nim](https://nim-lang.org) (not required to run the binary, only for compiling and installing through nimble)

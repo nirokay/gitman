@@ -23,7 +23,7 @@ proc add(op: Operation) =
 
 add Operation(
     name: "help",
-    desc: "Displays this help message.",
+    desc: "Displays help message.",
     alias: some @["h", "--help", "-h", "?", "-?"],
     call: helpCommand
 )
@@ -39,15 +39,15 @@ add Operation(
     name: "clone",
     desc: "Clones new git repository to repo directory.",
     alias: some @["add", "download", "get"],
-    args_range: some [argsOne, argsMax],
+    argsRange: some [argsOne, argsMax],
     call: cloneCommand
 )
 
 add Operation(
     name: "pull",
-    desc: "Synchronously Pulls changes for every git repo.",
+    desc: "Synchronously pulls changes for every git repo.",
     alias: some @["update"],
-    args_range: some [argsZero, argsMax],
+    argsRange: some [argsZero, argsMax],
     call: pullCommandSync
 )
 
@@ -55,7 +55,7 @@ add Operation(
     name: "async-pull",
     desc: "Asynchronously pulls changes for every git repo.",
     alias: some @["async-update"],
-    args_range: some [argsZero, argsMax],
+    argsRange: some [argsZero, argsMax],
     call: pullCommandAsync
 )
 
@@ -63,7 +63,7 @@ add Operation(
     name: "remove",
     desc: "Removes git repository from repo directory.",
     alias: some @["delete", "rm", "del"],
-    args_range: some [argsZero, argsMax],
+    argsRange: some [argsZero, argsMax],
     call: removeCommand
 )
 
@@ -78,7 +78,7 @@ add Operation(
     name: "install",
     desc: "Executes a specified install script for the repository.",
     alias: none seq[string],
-    args_range: some [argsZero, argsMax],
+    argsRange: some [argsZero, argsMax],
     call: installCommand
 )
 
